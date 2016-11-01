@@ -1,5 +1,7 @@
-Todo lo siguiente es sacado de https://angular.io/docs/ts/latest/tutorial/toh-pt1.html
 
+**PARTE 1**  
+=========
+https://angular.io/docs/ts/latest/tutorial/toh-pt1.html
 
 Paso 1
 ------
@@ -82,7 +84,7 @@ Paso 4 - Posibilidad de editar la información del heroe, desde el template. (Do
 
 - Añadimos un input con un atributo, [(ngModel)], que "apuntase" a la propiedad name de la instancia de Hero, quedando algo como:
 
-template:`
+template:` 
   <h1>{{title}}</h1>
   <h2>{{hero.name}} details!</h2>
   <div><label>id: </label>{{hero.id}}</div>
@@ -116,3 +118,152 @@ export class AppModule { }
 ```
 
 En este momento ya debería estar funcionando correctamente en el navegador.
+
+
+**PARTE 2** 
+=========
+https://angular.io/docs/ts/latest/tutorial/toh-pt2.html
+
+Paso 1 - Creando heroes
+----------
+- Mostraremos una lista de heroes, que por el momento serán estáticos, para ello primero debemos de tener esos heroes en algún sitio, para ello crearemos una constante, que será un array de tipo Hero en app.component.ts
+
+```javascript
+const HEROES: Hero[] = [
+  { id: 11, name: 'Mr. Nice' },
+  { id: 12, name: 'Narco' },
+  { id: 13, name: 'Bombasto' },
+  { id: 14, name: 'Celeritas' },
+  { id: 15, name: 'Magneta' },
+  { id: 16, name: 'RubberMan' },
+  { id: 17, name: 'Dynama' },
+  { id: 18, name: 'Dr IQ' },
+  { id: 19, name: 'Magma' },
+  { id: 20, name: 'Tornado' }
+];
+```
+- A continuación, **dentro de AppComponent**, crearemos una propiedad que apunte a este nuevo array
+
+```javascript
+heroes = HEROES; //En el futuro se recogerá de un service.
+``` 
+
+Paso 2 - Creando la vista para la lista de heroes
+-----------
+
+- En app.components.ts, a la template se le añade:
+```html
+<h2>My Heroes</h2>
+<ul class="heroes">
+  <li *ngFor="let hero of heroes">
+    <span class="badge">{{hero.id}}</span> {{hero.name}}
+  </li>
+</ul>
+```
+> El prefijo * de ngFor indica que se repite el li por cada iteración del for, dicho de otro modo el li es parte la template de cada hijo de la colección iterada.
+> "let" antes de hero indentifica a hero como una variable "input" del template, mencionada antes. Gracias a la cual, podremos acceder a sus atributos dentro de la template, como se puede apreciar en el contenido.
+
+Paso 3 - Aplicando estilos
+----------
+- Para añadir algunos estilos al componente, nos dirigimos al @Component de app.component.ts y le adjuntamos:
+```javascript
+styles: [`
+  .selected {
+    background-color: #CFD8DC !important;
+    color: white;
+  }
+  .heroes {
+    margin: 0 0 2em 0;
+    list-style-type: none;
+    padding: 0;
+    width: 15em;
+  }
+  .heroes li {
+    cursor: pointer;
+    position: relative;
+    left: 0;
+    background-color: #EEE;
+    margin: .5em;
+    padding: .3em 0;
+    height: 1.6em;
+    border-radius: 4px;
+  }
+  .heroes li.selected:hover {
+    background-color: #BBD8DC !important;
+    color: white;
+  }
+  .heroes li:hover {
+    color: #607D8B;
+    background-color: #DDD;
+    left: .1em;
+  }
+  .heroes .text {
+    position: relative;
+    top: -3px;
+  }
+  .heroes .badge {
+    display: inline-block;
+    font-size: small;
+    color: white;
+    padding: 0.8em 0.7em 0 0.7em;
+    background-color: #607D8B;
+    line-height: 1em;
+    position: relative;
+    left: -1px;
+    top: -4px;
+    height: 1.8em;
+    margin-right: .8em;
+    border-radius: 4px 0 0 4px;
+  }
+`]
+
+```
+>Cuando asignamos estilos a un componente, estos estilos no influyen en el resto, solo serán aplicables al mismo.
+
+
+Paso 4 - Mostrando los datos del heroe seleccionado
+-----------
+
+- Primero debemos poder seleccionar un elemento de la lista. Para ello añadimos (click)="onSelect(hero)" en el li.
+
+```javascript
+<li *ngFor="let hero of heroes" (click)="onSelect(hero)">
+```
+- Y ahora trabajamos con el hero seleccionado en el componente (de app.component.ts). Para ello debemos crear la función mencionada, y que digimos que iba a responder a tal selección, onSelect. Nuestra intención es que dentro de ese onSelect, al que se le pasa el heroe seleccionado, lo guarde en nuestro componente, por tanto crearemos una instancia de Hero en el componente, llamada selectedHero.
+
+```javascript
+selectedHero: Hero;
+```
+y ahora haremos lo mencionado, tambien dentro del componente:
+
+```javascript
+onSelect(hero: Hero): void {
+  this.selectedHero = hero;
+}
+```
+- Ahora que ya tenemos el heroe que se ha seleccionado guardado en el componente, podemos cambiar la template utilizada, de forma que en lugar de mostrar los datos del atributo "hero" del componente, muestre el de "selectHero"
+```html
+<h2>{{selectedHero.name}} details!</h2>
+<div><label>id: </label>{{selectedHero.id}}</div>
+<div>
+    <label>name: </label>
+    <input [(ngModel)]="selectedHero.name" placeholder="name"/>
+</div>
+```
+- El problema es que inicialmente no dispone de valor, por lo que puede dar error, para solucionarlo lo que haremos será englobarlo en un <div *ngIf="selectedHero"> </div>, quedando todo:
+
+```html
+<div *ngIf="selectedHero">
+  <h2>{{selectedHero.name}} details!</h2>
+  <div><label>id: </label>{{selectedHero.id}}</div>
+  <div>
+    <label>name: </label>
+    <input [(ngModel)]="selectedHero.name" placeholder="name"/>
+  </div>
+</div>
+```
+- Para que se pueda ver como "seleccionado" el elmento pulsado, en el "li" le añadiremos el código [class.selected]="hero === selectedHero" de esta forma cuando la condición "hero === selectedHero" se dea, se le añadirá un class="selected" al "li" pulsado. El "li" quedará de la siguiente forma:
+
+```html
+<li *ngFor="let hero of heroes" [class.selected]="hero === selectedHero" (click)="onSelect(hero)">
+```
