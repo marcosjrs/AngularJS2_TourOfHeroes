@@ -4,7 +4,7 @@ Todo lo siguiente es sacado de https://angular.io/docs/ts/latest/tutorial/toh-pt
 Paso 1
 ------
 
--Creamos una carpeta llamada angular-tour-of-heroes y sequimos las instrucciones del QuickStart oficial de la página de Angular (https://angular.io/docs/ts/latest/quickstart.html), los pasos los pongo en el archivo readme_quickstart.md de este proyecto.
+- Creamos una carpeta llamada angular-tour-of-heroes y sequimos las instrucciones del QuickStart oficial de la página de Angular (https://angular.io/docs/ts/latest/quickstart.html), los pasos los pongo en el archivo readme_quickstart.md de este proyecto.
 Para comprobar que todo está correcto y que se muestra un navegador con el saludo, ejecutamos:
 
 ```
@@ -17,7 +17,7 @@ Este navegador lo dejaremos abierto para ir viendo los cambios que realizaremos.
 Paso 2 - Comenzando los cambios.
 ------
 
--Añadimos dos propieades a nuestro componente AppComponent, una para el nombre de la aplicación y otra para el nombre de heroe en cuestión.
+- Añadimos dos propieades a nuestro componente AppComponent, una para el nombre de la aplicación y otra para el nombre de heroe en cuestión.
 Quedando así: 
 
 ```javascript
@@ -27,7 +27,7 @@ export class AppComponent {
 }
 ```
 
--Tambien actualizamos su decorador, cambiando la template para que utilice las dos propiedades mencionadas.
+- Tambien actualizamos su decorador, cambiando la template para que utilice las dos propiedades mencionadas.
 
 
 ```javascript
@@ -48,7 +48,7 @@ export class Hero {
   name: string;
 }
 ```
--Y Ahora en el AppComponente cambiaremos el hero, que antes era un string, por una instancia rellenada....
+- Y Ahora en el AppComponente cambiaremos el hero, que antes era un string, por una instancia rellenada....
 
 ```javascript
 hero: Hero = {
@@ -57,7 +57,7 @@ hero: Hero = {
 };
 ```
 
--Ahora ya podremos cambiar el template para que coja el dato de esta nueva instancia creada.
+- Ahora ya podremos cambiar el template para que coja el dato de esta nueva instancia creada.
 
 ```javascript
 template: '<h1>{{title}}</h1><h2>{{hero.name}} details!</h2>'
