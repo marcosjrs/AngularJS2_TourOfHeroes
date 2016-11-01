@@ -46,10 +46,11 @@ Paso 3 - Creando la clase Hero y mostrar su información
 
 ```javascript
 export class Hero {
-  id: number;;
+  id: number;
   name: string;
 }
 ```
+
 - Y Ahora en el AppComponente cambiaremos el hero, que antes era un string, por una instancia rellenada....
 
 ```javascript
@@ -98,7 +99,7 @@ template:`
 
 - Pero no funcionará, para que funcione el "doble binding" o "two-way data binding", en el **app.module.ts**, tendremos que importar el FormsModule (por ejemplo debajo del import de BrowserModule).. e importarlo en el array imports del decorador NgModule, que son la lista de módulos externos usados por la aplicación. Quedando como sigue:
 
-```
+```javascript
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
@@ -114,7 +115,6 @@ import { AppComponent }  from './app.component';
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
-
 ```
 
 En este momento ya debería estar funcionando correctamente en el navegador.
@@ -146,7 +146,7 @@ const HEROES: Hero[] = [
 
 ```javascript
 heroes = HEROES; //En el futuro se recogerá de un service.
-``` 
+```
 
 Paso 2 - Creando la vista para la lista de heroes
 -----------
@@ -166,6 +166,7 @@ Paso 2 - Creando la vista para la lista de heroes
 Paso 3 - Aplicando estilos
 ----------
 - Para añadir algunos estilos al componente, nos dirigimos al @Component de app.component.ts y le adjuntamos:
+
 ```javascript
 styles: [`
   .selected {
@@ -216,8 +217,8 @@ styles: [`
     border-radius: 4px 0 0 4px;
   }
 `]
-
 ```
+
 >Cuando asignamos estilos a un componente, estos estilos no influyen en el resto, solo serán aplicables al mismo.
 
 
@@ -267,3 +268,118 @@ onSelect(hero: Hero): void {
 ```html
 <li *ngFor="let hero of heroes" [class.selected]="hero === selectedHero" (click)="onSelect(hero)">
 ```
+
+**PARTE 3** 
+===========
+https://angular.io/docs/ts/latest/tutorial/toh-pt3.html
+
+Paso 1 - Inicio de separación de funcionalidad y visualización de detalle de Hero
+--------
+- La intención es separar lo hecho hasta ahora, empezando por el apartado correspondiente a la muestra de información del heroe; por lo que haremos un componente para guardar, manejar y mostrar dicha información, eliminando este apartado del otro componente. Inicialmente, en la carpeta app, crearemos un hero-detail.component.ts con el siguiente contenido:
+
+```javascript
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'my-hero-detail',
+  template: `
+  <div *ngIf="hero">
+  <h2>{{hero.name}} details!</h2>
+  <div><label>id: </label>{{hero.id}}</div>
+  <div>
+    <label>name: </label>
+    <input [(ngModel)]="hero.name" placeholder="name"/>
+  </div>
+</div>`
+})
+export class HeroDetailComponent {
+  hero:Hero;
+}
+```
+
+>Con selector: 'my-hero-detail', estamos diciendo que la forma de instanciarlo en el html será con un tag < my-hero-detail > 
+
+
+- En este punto tendríamos un error en HeroDetailComponent, porque no encontrará la clase Hero, que es el tipo del atributo hero, que le hemos creado. Por tanto ahora crearemos la clase externa Hero (para luego utilizarla donde sea necesario). Creamos un hero.ts en la carpeta app con el siguiente contenido:
+
+```javascript
+export class Hero {
+  id: number;
+  name: string;
+}
+```
+y ahora ya lo podemos importar en hero-detail.component.ts
+
+```javascript
+import { Hero } from './hero';
+```
+- Aprovechando, recordamos que en app.component.ts teniamos una clase interna Hero, que debemos borrar e importar la nueva, como hemos hecho para hero-detail.component.ts
+
+
+Paso 2 - Propiedad de entrada "hero" en el nuevo componente. 
+-------
+. El nuevo componente de detalles de hero (HeroDetailComponent), necesita que se le pase el hero a mostrar en los detalles, para ello se le añade una propiedad "input" en su clase (para eso se le pone @Input encima de la propiedad de su propiedad "hero", que ya tenía); 
+
+```javascript
+  @Input()
+  hero: Hero;
+```
+A la vez que en html tendrá reflejado ese parametro de entrada, para lo cual se añadirá  [hero]="UnaInstanciaDeHeroValida" en el componente en el momento que lo instanciemos, que será más adelante... quedaría algo así:
+
+```html
+<my-hero-detail [hero]="UnaInstanciaDeHeroValida"></my-hero-detail>
+```
+
+
+
+Paso 3 - Refrescando AppComponent y AppModule
+---------
+
+- Ahora que tenemos un nuevo componente al que poder pasarle una instancia de hero, ya podemos utilizarlo en el AppComponent en lugar de lo anterior.... por tanto, en app.component.ts, el valor de su atributo template sería :
+
+```javascript
+template: `
+  <h1>{{title}}</h1>
+  <h2>My Heroes</h2>
+  <ul class="heroes">
+    <li *ngFor="let hero of heroes"
+      [class.selected]="hero === selectedHero"
+      (click)="onSelect(hero)">
+      <span class="badge">{{hero.id}}</span> {{hero.name}}
+    </li>
+  </ul>
+  <my-hero-detail [hero]="selectedHero"></my-hero-detail>
+`
+```
+>Como vemos (en [hero]="selectedHero" ) el AppComponent le pasará como instancia de hero, el selectHero contenido.
+
+- Ahora para que todo funcione, debemos importar el hero-detail.component en AppModule (que es la principal) y añadirlo al atributo declarations del NgModule, que es donde se deben añadir todos los componentes utilizado en el modulo principal. Por tanto en AppModule añadimos el import: 
+
+```javascript
+import { HeroDetailComponent } from './hero-detail.component';
+```
+
+y modificamos el @NgModule, quedando:
+
+```javascript
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    HeroDetailComponent
+  ],
+  bootstrap: [ AppComponent ]
+})
+export class AppModule { }
+```
+
+
+
+
+
+
+
+
