@@ -376,6 +376,162 @@ y modificamos el @NgModule, quedando:
 export class AppModule { }
 ```
 
+**PARTE 4** Cambio de forma de alimentar con datos (Servicios) 
+=========== 
+En esta parte crearemos un servicio que alimentará la aplicación, injectandola como dependencia.
+
+Paso 1 Crear la clase/servicio
+------
+
+- En la carpeta app, crearemos el archivo hero.service.ts donde crearemos el servicio HeroService (por convención, Sevice para a ser .service y el resto se separarían con guiones, por ejemplo, si crearamos SuperHeroService el archivo sería super-hero.service.ts). El contenido de hero.service.ts :
+
+```javascript
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class HeroService {
+}
+```
+
+- Ahora le añadiremos el metodo getHeroes en la clase, quedando:
+
+```javascript
+export class HeroService {
+   getHeroes(): void {} // Esta función será la que en un futuro obtendrá los datos... cuando sea, se cambiará el objeto a devolver...
+}
+```
+
+Paso 2 Aislando el mock de Heroes
+------
+Hasta ahora la constante HEROES se encontraba en app.component.js ahora crearemos un archivo para él; que será el utilizado por el Servicio creado anteriormente.
+
+- Dentro de la carpeta app, creamos un archivo llamado mock-heroes.ts, a donde moveremos el array constante HEROES de app.component.ts, debido a que el array es de objetos Hero, en el archivo creado debemos tambien importar la clase. El contenido de mock-heroes.ts, quedaría:
+
+```javascript
+import { Hero } from './hero';
+export const HEROES: Hero[] = [
+  {id: 11, name: 'Mr. Nice'},
+  {id: 12, name: 'Narco'},
+  {id: 13, name: 'Bombasto'},
+  {id: 14, name: 'Celeritas'},
+  {id: 15, name: 'Magneta'},
+  {id: 16, name: 'RubberMan'},
+  {id: 17, name: 'Dynama'},
+  {id: 18, name: 'Dr IQ'},
+  {id: 19, name: 'Magma'},
+  {id: 20, name: 'Tornado'}
+];
+
+```
+
+- En este punto en app.component.ts no debería estar la constante anterior, por tanto dará un error, ya que tenermos que modificar la variable "heroes" de AppComponent, quedando 
+
+```javascript
+heroes: Hero[]; //en lugar de heroes = HEROES;
+```
+
+Paso 3 - Cambiando hero.service para que devuelva los Heroes 
+------
+
+- Cambiamos hero.service.ts importando hero (porque getHeroes devolverá un array de este tipo) y el mock-heroes (porque será lo que devuelva). Quedando:
+
+```javascript
+import { Injectable } from '@angular/core';
+
+import { Hero } from './hero';
+import { HEROES } from './mock-heroes';
+
+@Injectable()
+export class HeroService {
+  getHeroes(): Hero[] {
+    return HEROES; 
+  }
+}
+```
+
+Paso 4 - Uso del nuevo servicio en app.component
+--------
+
+- En app.component podemos importar el servicio, de la siguiente forma...
+
+```javascript
+import { HeroService } from './hero.service';
+```
+
+- Para injectarlo en el constructor
+
+```javascript
+constructor(private heroService: HeroService) { }
+```
+
+- Para que el componente sepa que se trata de un servicio, debe añadirse como provider en @Component, por tanto dentro del decorador mencionado, se añade:
+
+```javascript
+providers: [HeroService]
+```
+
+- En el Appcomponent, a modo de la evolución en el aprendizaje, añadimos un método de como obtendríamos los datos.
+
+```javascript
+ getHeroes(): void {
+    this.heroes = this.heroService.getHeroes();
+  }
+```
+
+- Angular permite hooks en el ciclo de vida de la aplicación, que se ejecutan al iniciar, al modificarse o al destruir la aplicación.... En nuestro caso vamos a servirnos del OnInit para llamar al método creado anteriormente (getHeroes). Para ello debemos primero importarlo y luego implementar ya que se tratan de interfaces. Quedaría...
+
+
+```javascript
+import { OnInit } from '@angular/core';
+
+export class AppComponent implements OnInit {
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+  //.....
+}
+
+```
+
+Paso 5 - Cambiando de sincrono a asíncrono (Promesas)
+--------
+
+Por el momento tenemos un servicio que es sincrono, dispone de los datos directamente, y por tanto "no" hay esperas; hay que contar que en algún momento será un servicio real que está alojado en algún servidor remoto... (por el momento no se vió llamadas http, pero en breve haremos el cambio...) Por lo que vamos a cambiar el código para que sea asincrónico, utilizando "promesas". (Una promesa sirve para que nos llame cuando el resultado esté listo http://exploringjs.com/es6/ch_promises.html )
+
+- Abrimos hero.service.ts y actualizamos el metodo getHeroes (que seguirá utilizando el mook, por tanto será superápido, pero ahora con la promesa...)
+
+```javascript
+
+getHeroes(): Promise<Hero[]> {
+  return Promise.resolve(HEROES);
+}
+
+```
+
+Si quisieramos simular, que tarda dos segundos, podríamos poner un timeout por el medio en la devolución de la promesa, algo como: 
+  return new Promise<Hero[]>(resolve => setTimeout(resolve, 2000)) 
+                            .then(() => this.getHeroes());
+
+- Al hacer el cambio anterior, tambien tendremos que actualizar donde se hace uso de este método, ya que ahora ya no devuelve un array, sino una promesa y por tanto el array se obtendrá a través de dicha promersa. Así que vamos a app.component.ts y cambiamos su metodo getHeroes, quedando:
+
+```javascript
+getHeroes(): void {
+  this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
