@@ -540,12 +540,10 @@ Acciones a realizar:
 
 Para ello comenzaremos a utilizar el Routing (navegación) de AngularJS. El plan es el siguiente:
 
-- Convertir AppComponent en una parte que sólo se ocupe de la navegación 
-- Reubicar lo que concierne a los "héroes", que ahora está en AppComponent, a un nuevo 
-- HeroesComponent.
+- Reubicar lo que concierne a los "héroes", que ahora está en AppComponent, a un nuevo HeroesComponent y convertir AppComponent en una parte que sólo se ocupe de la navegación 
 - Agregar un enrutamiento 
-- Crear un nuevo cuadro de mandos
-- Componente Ate el cuadro de mandos a la estructura de navegación
+- Crear un nuevo dashboard (cuadro de mandos)
+- Acceder al dashboard  mediante el enrutamiento
 
 
 
