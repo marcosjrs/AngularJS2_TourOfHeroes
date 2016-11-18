@@ -35,7 +35,8 @@ export class AppComponent {
 ```javascript
 template: '<h1>{{title}}</h1><h2>{{hero}} details!</h2>'
 ```
-Si todo va bien en este punto ya se tendría que ver el cambio en el navegador (si es que no lo cerramos...)
+Si todo va bien en este punto ya se tendría que ver el cambio en el navegador (si es que no lo cerramos... ,si es así podremos volver a ejercutar npm start  ;)  ).
+
 
 
 
@@ -251,7 +252,7 @@ onSelect(hero: Hero): void {
     <input [(ngModel)]="selectedHero.name" placeholder="name"/>
 </div>
 ```
-- El problema es que inicialmente no dispone de valor, por lo que puede dar error, para solucionarlo lo que haremos será englobarlo en un <div *ngIf="selectedHero"> </div>, quedando todo:
+- El problema es que inicialmente no dispone de valor, por lo que puede dar error, para solucionarlo lo que haremos será englobarlo en un  div con  *ngIf="selectedHero" , quedando todo:
 
 ```html
 <div *ngIf="selectedHero">
@@ -263,7 +264,7 @@ onSelect(hero: Hero): void {
   </div>
 </div>
 ```
-- Para que se pueda ver como "seleccionado" el elmento pulsado, en el "li" le añadiremos el código [class.selected]="hero === selectedHero" de esta forma cuando la condición "hero === selectedHero" se dea, se le añadirá un class="selected" al "li" pulsado. El "li" quedará de la siguiente forma:
+- Para que se pueda ver como "seleccionado" el elemento pulsado, en el "li" le añadiremos el código [class.selected]="hero === selectedHero" de esta forma cuando la condición "hero === selectedHero" se dea, se le añadirá un class="selected" al "li" pulsado. El "li" quedará de la siguiente forma:
 
 ```html
 <li *ngFor="let hero of heroes" [class.selected]="hero === selectedHero" (click)="onSelect(hero)">
@@ -376,8 +377,10 @@ y modificamos el @NgModule, quedando:
 export class AppModule { }
 ```
 
-**PARTE 4** Cambio de forma de alimentar con datos (Servicios) 
+**PARTE 4**
 =========== 
+https://angular.io/docs/ts/latest/tutorial/toh-pt4.html
+
 En esta parte crearemos un servicio que alimentará la aplicación, injectandola como dependencia.
 
 Paso 1 Crear la clase/servicio
@@ -401,7 +404,7 @@ export class HeroService {
 }
 ```
 
-Paso 2 Aislando el mock de Heroes
+Paso 2 - Aislando el mock de Heroes
 ------
 Hasta ahora la constante HEROES se encontraba en app.component.js ahora crearemos un archivo para él; que será el utilizado por el Servicio creado anteriormente.
 
@@ -520,13 +523,99 @@ getHeroes(): void {
 }
 ```
 
+**PARTE 5** 
+=========== 
+https://angular.io/docs/ts/latest/tutorial/toh-pt5.html
+
+Acciones a realizar:
+
+- Añadir un dashboard con los "top 4".
+- Navegar entre el listado de Heroes anterior y el nuevo dashboard.
+- Clickando sobre un heroe en cualquiera de las vistas nos dirigirá a la vista de detalles del heroe seleccionado.
+- Clickando en un link ( dentro de un email ) no dirigirá a la vista de un heroe en particular.
+
+![Imagen del caso de uso]
+(https://angular.io/resources/images/devguide/toh/nav-diagram.png)
+
+
+Para ello comenzaremos a utilizar el Routing (navegación) de AngularJS. El plan es el siguiente:
+
+- Convertir AppComponent en una parte que sólo se ocupe de la navegación 
+- Reubicar lo que concierne a los "héroes", que ahora está en AppComponent, a un nuevo 
+- HeroesComponent.
+- Agregar un enrutamiento 
+- Crear un nuevo cuadro de mandos
+- Componente Ate el cuadro de mandos a la estructura de navegación
 
 
 
+Paso 1 - Pasar el contenido de AppComponent a un nuevo HeroesComponent. Para luego cargar este último en un nuevo AppComponent.
+------
 
+El app.component.ts, que se encuentra en la carpeta app, la renombramos por heroes.component.ts . Dentro le cambiamos el nombre de la clase
 
+```javascript
+export class HeroesComponent implements OnInit {
+}
 
+```
 
+y el selector, que está dentro del decorador Component
+
+```javascript
+@Component({
+  selector: 'my-heroes',
+})
+```
+
+Una vez que ya tenemos nuestro nuevo componente Heroes, vamos a crear de nuevo el app component, pero ahora servirá como "navegador".
+Creamos  el archivo app/app.component.ts donde crearemos la clase AppComponent, que dentro tendrá un atributo title. Le pondremos a la clase un decorador Component, cuyo selector será 'mi-app' y cuya template será un simple h1 con el atributo title de la clase y la etiqueta my-heroes, para instanciar HeroesComponent (el que antes era AppComponent), quedando inicialmente algo como: 
+
+```javascript
+import { Component } from '@angular/core';
+@Component({
+  selector: 'my-app',
+  template: `
+    <h1>{{title}}</h1>
+    <my-heroes></my-heroes>
+  `
+})
+export class AppComponent {
+  title = 'Tour of Heroes';
+}
+
+``` 
+Al poner el title aquí, debemos de quitarlo de Appcomponent, para no duplicar, para eso simplemente podemos eliminar el h1 correspondiente (de la propiedad template) y la propiedad title de heroes.component.ts.
+
+Ahora nos dirigimos a AppModule (app/app.module.ts), al que le añadimos en el array declarations el HeroComponent (ya que es donde ponemos todos los componentes de los que se hacen uso, y este es nuevo..). Tambien le hacemos un import a HeroService y lo metemos en el array provider del NgModule, ya que necesitaremos este servicio en las vistas. Y por tanto, borraremos el HeroService del providers de HeroesComponent. app.modules.ts quedaría algo como:
+
+```javascript
+import { NgModule }       from '@angular/core';
+import { BrowserModule }  from '@angular/platform-browser';
+import { FormsModule }    from '@angular/forms';
+import { AppComponent }        from './app.component';
+import { HeroDetailComponent } from './hero-detail.component';
+import { HeroesComponent }     from './heroes.component';
+import { HeroService }         from './hero.service';
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    HeroDetailComponent,
+    HeroesComponent
+  ],
+  providers: [
+    HeroService
+  ],
+  bootstrap: [ AppComponent ]
+})
+export class AppModule {
+}
+
+```
 
 
 
